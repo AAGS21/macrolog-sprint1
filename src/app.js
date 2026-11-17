@@ -8,6 +8,7 @@ import healthRoutes from "./api/health.routes.js";
 import pruebaRoutes from "./api/prueba.routes.js";
 import { createAuthRouter } from "./api/auth.routes.js";
 import { createUsersRouter } from "./api/users.routes.js";
+import { createMealsRouter } from "./api/meals.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { AppError } from "./utils/appError.js";
 
@@ -17,6 +18,7 @@ const publicDirectory = path.join(currentDirectory, "..", "public");
 
 export function createApp({
   userService,
+  mealService,
   sessionSecret,
   sessionStore,
   isProduction = false
@@ -59,6 +61,7 @@ export function createApp({
   app.use("/api/prueba", pruebaRoutes);
   app.use("/api/auth", createAuthRouter({ userService }));
   app.use("/api/users", createUsersRouter({ userService }));
+  app.use("/api/meals", createMealsRouter({ mealService }));
   app.use(express.static(publicDirectory));
 
   app.use((request, response, next) => {

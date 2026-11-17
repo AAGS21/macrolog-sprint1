@@ -6,6 +6,8 @@ import {
   PostgresUserRepository
 } from "../repositories/postgresUser.repository.js";
 import { UserService } from "../services/user.service.js";
+import { PostgresMealRepository } from "../repositories/postgresMeal.repository.js";
+import { MealService } from "../services/meal.service.js";
 
 export async function createDependencies({
   databaseUrl,
@@ -27,6 +29,8 @@ export async function createDependencies({
       passwordRounds
     }
   );
+  const mealRepository = new PostgresMealRepository(pool);
+  const mealService = new MealService(mealRepository, userService);
 
   if (adminEmail && adminPassword) {
     const normalizedAdminEmail =
@@ -48,6 +52,8 @@ export async function createDependencies({
   return {
     pool,
     userRepository,
-    userService
+    userService,
+    mealRepository,
+    mealService
   };
 }

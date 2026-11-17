@@ -28,7 +28,8 @@ const requireEmailConfirmation =
 
 const {
   pool,
-  userService
+  userService,
+  mealService
 } = await createDependencies({
   databaseUrl,
   requireEmailConfirmation,
@@ -46,6 +47,7 @@ const sessionStore = new PostgresSessionStore({
 
 const app = createApp({
   userService,
+  mealService,
   sessionSecret,
   sessionStore,
   isProduction: process.env.NODE_ENV === "production"
