@@ -1,9 +1,11 @@
+import session from "express-session";
 import { createApp } from "../../src/app.js";
 import { InMemoryUserRepository } from "../../src/repositories/inMemoryUser.repository.js";
 import { UserService } from "../../src/services/user.service.js";
 
-export async function createTestContext() {
+export async function createTestContext({ isProduction = false } = {}) {
   const userRepository = new InMemoryUserRepository();
+  const sessionStore = new session.MemoryStore();
 
   const userService = new UserService(userRepository, {
     passwordRounds: 4,
@@ -20,13 +22,15 @@ export async function createTestContext() {
   const app = createApp({
     userService,
     sessionSecret: "test-session-secret-with-at-least-32-characters",
-    isProduction: false
+    sessionStore,
+    isProduction
   });
 
   return {
     app,
     userRepository,
     userService,
+    sessionStore,
     admin,
     adminCredentials
   };
