@@ -378,6 +378,121 @@ tbody tr:last-child td {
   display: none !important;
 }
 
+.dashboard [hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.date-selector {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.date-selector label,
+.meal-field label {
+  font-weight: 650;
+}
+
+.date-selector input,
+.meal-field input {
+  min-width: 0;
+  max-width: 100%;
+  padding: 11px 12px;
+  color: #17251d;
+  background: #ffffff;
+  border: 1px solid #bfcac2;
+  border-radius: 7px;
+}
+
+.date-selector input:focus-visible,
+.meal-field input:focus-visible,
+.dashboard button:focus-visible {
+  outline: 3px solid #287d49;
+  outline-offset: 3px;
+}
+
+.nutrition-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.4fr);
+  align-items: start;
+  gap: 24px;
+  margin-top: 28px;
+}
+
+.nutrition-layout .panel {
+  min-width: 0;
+  margin-top: 0;
+}
+
+.meal-form {
+  padding: 24px;
+}
+
+.meal-form fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.meal-field {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.meal-nutrients {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.meal-form-actions,
+.meal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meal-table td:first-child {
+  min-width: 130px;
+  max-width: 230px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.meal-table td {
+  vertical-align: top;
+}
+
+.meals-status {
+  padding: 0 24px;
+  color: #617067;
+}
+
+.retry-meals {
+  margin: 0 24px 24px;
+}
+
+@media (max-width: 900px) {
+  .nutrition-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 @media (max-width: 700px) {
   .topbar {
     align-items: flex-start;

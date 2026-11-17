@@ -37,38 +37,94 @@
       </div>
     </section>
 
-    <section class="summary" aria-label="Resumen nutricional">
+    <div class="date-selector">
+      <label for="selected-date">Consultar día</label>
+      <input id="selected-date" type="date" min="0001-01-01" max="9999-12-31" required disabled>
+    </div>
+
+    <p id="page-message" class="form-message" aria-live="polite"></p>
+
+    <section id="daily-summary" class="summary" aria-label="Resumen nutricional" aria-live="polite" aria-busy="true">
       <article class="metric">
         <span>Calorías consumidas</span>
-        <strong>0 kcal</strong>
+        <strong id="calories-total">— kcal</strong>
       </article>
 
       <article class="metric">
         <span>Proteínas consumidas</span>
-        <strong>0 g</strong>
+        <strong id="protein-total">— g</strong>
       </article>
 
       <article class="metric">
         <span>Comidas registradas</span>
-        <strong>0</strong>
+        <strong id="meal-count">—</strong>
       </article>
     </section>
 
-    <section class="panel">
-      <div class="panel-heading">
-        <div>
-          <h2>Comidas de hoy</h2>
-          <p class="muted">
-            Aquí aparecerán las comidas que registres.
-          </p>
+    <div class="nutrition-layout">
+      <section class="panel" aria-labelledby="meal-form-title">
+        <div class="panel-heading">
+          <h2 id="meal-form-title">Registrar comida</h2>
         </div>
-      </div>
 
-      <div class="empty-state">
-        <strong>No hay comidas registradas</strong>
-        <span>Tu historial diario está vacío.</span>
-      </div>
-    </section>
+        <form id="meal-form" class="meal-form" aria-describedby="page-message">
+          <fieldset id="meal-fields" disabled>
+            <legend class="visually-hidden">Datos de la comida</legend>
+            <div class="meal-field">
+              <label for="meal-name">Nombre</label>
+              <input id="meal-name" name="name" type="text" maxlength="100" required>
+            </div>
+            <div class="meal-nutrients">
+              <div class="meal-field">
+                <label for="meal-calories">Calorías (kcal)</label>
+                <input id="meal-calories" name="calories" type="number" min="0" max="9007199254740991" step="1" required>
+              </div>
+              <div class="meal-field">
+                <label for="meal-protein">Proteínas (g)</label>
+                <input id="meal-protein" name="proteinGrams" type="number" min="0" max="90071992547409.9" step="0.01" required>
+              </div>
+            </div>
+            <div class="meal-field">
+              <label for="meal-date">Fecha de consumo</label>
+              <input id="meal-date" name="mealDate" type="date" min="0001-01-01" max="9999-12-31" required>
+            </div>
+            <div class="meal-form-actions">
+              <button id="save-meal-button" class="button" type="submit">Guardar comida</button>
+              <button id="cancel-meal-button" class="table-button" type="button" hidden>Cancelar edición</button>
+            </div>
+          </fieldset>
+        </form>
+      </section>
+
+      <section id="meals-panel" class="panel" aria-labelledby="meals-title" aria-busy="true">
+        <div class="panel-heading">
+          <div>
+            <h2 id="meals-title">Comidas del día</h2>
+            <p class="muted">Registros de la fecha seleccionada.</p>
+          </div>
+        </div>
+        <p id="meals-status" class="meals-status" role="status" aria-live="polite">Cargando sesión…</p>
+        <button id="retry-meals-button" class="table-button retry-meals" type="button" hidden>Reintentar carga</button>
+        <div id="meals-empty" class="empty-state" hidden>
+          <strong>No hay comidas registradas</strong>
+          <span>Añade una comida para este día con el formulario.</span>
+        </div>
+        <div id="meals-table-container" class="table-container" hidden>
+          <table class="meal-table">
+            <caption class="visually-hidden">Comidas de la fecha seleccionada</caption>
+            <thead>
+              <tr>
+                <th scope="col">Comida</th>
+                <th scope="col">kcal</th>
+                <th scope="col">Proteínas</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="meals-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
 
     <section class="danger-zone">
       <div>
@@ -83,7 +139,6 @@
       </button>
     </section>
 
-    <p id="page-message" class="form-message" aria-live="polite"></p>
   </main>
 </body>
 </html>

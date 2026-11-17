@@ -70,3 +70,27 @@ export function deleteUser(userId) {
     method: "DELETE"
   });
 }
+
+export function getMeals(date) {
+  return apiRequest(`/api/meals?${new URLSearchParams({ date })}`);
+}
+
+export function createMeal(meal) {
+  return apiRequest("/api/meals", {
+    method: "POST",
+    body: JSON.stringify(meal)
+  });
+}
+
+export function updateMeal(id, changes) {
+  return apiRequest(`/api/meals/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify(changes)
+  });
+}
+
+export function deleteMeal(id) {
+  return apiRequest(`/api/meals/${encodeURIComponent(id)}`, {
+    method: "DELETE"
+  });
+}
