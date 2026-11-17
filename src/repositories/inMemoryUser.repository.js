@@ -30,6 +30,9 @@ export class InMemoryUserRepository {
     if (this.users.some((existing) => existing.id === storedUser.id)) {
       throw duplicateConfirmationValue("users_pkey");
     }
+    if (this.users.some((existing) => existing.email === storedUser.email)) {
+      throw duplicateConfirmationValue("users_email_key");
+    }
     this.users.push(storedUser);
     return { ...storedUser };
   }

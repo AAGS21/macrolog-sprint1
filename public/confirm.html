@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Confirmar tu cuenta de MacroLog">
+  <title>Confirmar cuenta | MacroLog</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script type="module" src="/js/confirm.js"></script>
+</head>
+<body class="auth-page">
+  <header class="topbar">
+    <a class="brand" href="/">MacroLog</a>
+    <nav aria-label="Navegación principal">
+      <a href="/login.html">Iniciar sesión</a>
+    </nav>
+  </header>
+
+  <main class="auth-main">
+    <section id="confirmation-card" class="auth-card" aria-busy="true">
+      <p class="eyebrow">Confirmación de cuenta</p>
+      <h1>Confirma tu cuenta</h1>
+      <p
+        id="confirmation-message"
+        class="form-message muted"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >Confirmando tu cuenta…</p>
+      <noscript>
+        <p class="form-message form-message-error">
+          Activa JavaScript y vuelve a abrir el enlace de tu correo para confirmar la cuenta.
+        </p>
+      </noscript>
+      <p class="auth-link">
+        <a href="/login.html">Volver al inicio de sesión</a>
+      </p>
+    </section>
+  </main>
+</body>
+</html>
