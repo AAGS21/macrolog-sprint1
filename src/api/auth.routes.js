@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { logger } from "../utils/logger.js";
+import { createResendRateLimiter } from "../middleware/resendRateLimit.middleware.js";
 
 const asyncHandler = (handler) => (request, response, next) => {
   Promise.resolve(handler(request, response, next)).catch(next);
@@ -34,6 +35,7 @@ function destroySession(request) {
 
 export function createAuthRouter({ userService }) {
   const router = Router();
+  const resendRateLimiter = createResendRateLimiter();
 
   router.post(
     "/register",
@@ -44,11 +46,29 @@ export function createAuthRouter({ userService }) {
       });
 
       logger.info("user.registered", {
-        userId: user.id,
-        email: user.email
+        userId: user.id
       });
 
       response.status(201).json({ user });
+    })
+  );
+
+  router.post(
+    "/confirm",
+    asyncHandler(async (request, response) => {
+      const user = await userService.confirmAccount(request.body?.token);
+      response.status(200).json({ user });
+    })
+  );
+
+  router.post(
+    "/resend-confirmation",
+    resendRateLimiter,
+    asyncHandler(async (request, response) => {
+      await userService.resendConfirmation(request.body?.email);
+      response.status(202).json({
+        message: "Si la cuenta está pendiente y puede recibir otro correo, enviaremos un enlace de confirmación."
+      });
     })
   );
 

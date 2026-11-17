@@ -1,20 +1,21 @@
 import bcrypt from "bcryptjs";
 import { randomUUID } from "node:crypto";
 import { AppError } from "../utils/appError.js";
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { normalizeEmail } from "../utils/email.js";
 
 export class UserService {
   constructor(
     userRepository,
     {
       passwordRounds = 10,
-      requireEmailConfirmation = false
+      requireEmailConfirmation = false,
+      emailConfirmationService
     } = {}
   ) {
     this.userRepository = userRepository;
     this.passwordRounds = passwordRounds;
     this.requireEmailConfirmation = requireEmailConfirmation;
+    this.emailConfirmationService = emailConfirmationService;
   }
 
   async register({ email, password }) {
@@ -36,10 +37,9 @@ export class UserService {
   }
 
   async createUser({ email, password, role, confirmed }) {
-    const normalizedEmail =
-      typeof email === "string" ? email.trim().toLowerCase() : "";
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!EMAIL_PATTERN.test(normalizedEmail)) {
+    if (!normalizedEmail) {
       throw new AppError(
         "El email no tiene un formato válido",
         400,
@@ -69,7 +69,7 @@ export class UserService {
     const passwordHash = await bcrypt.hash(password, this.passwordRounds);
     const now = new Date().toISOString();
 
-    const user = await this.userRepository.create({
+    const account = {
       id: randomUUID(),
       email: normalizedEmail,
       passwordHash,
@@ -78,9 +78,43 @@ export class UserService {
       deletedAt: null,
       createdAt: now,
       updatedAt: now
-    });
+    };
+
+    let user;
+    try {
+      user = !confirmed && this.requireEmailConfirmation
+        ? await this.requireConfirmationService().registerPendingAccount(account)
+        : await this.userRepository.create(account);
+    } catch (error) {
+      if (error.code === "23505" && error.constraint === "users_email_key") {
+        throw new AppError("Ya existe una cuenta con ese email", 409, "EMAIL_ALREADY_EXISTS");
+      }
+      throw error;
+    }
 
     return this.toPublicUser(user);
+  }
+
+  requireConfirmationService() {
+    if (!this.emailConfirmationService) {
+      throw new AppError("La configuración de confirmación de cuentas no es válida", 500, "EMAIL_CONFIRMATION_CONFIG_ERROR");
+    }
+    return this.emailConfirmationService;
+  }
+
+  async confirmAccount(rawToken) {
+    const user = this.requireEmailConfirmation
+      ? await this.requireConfirmationService().confirmAccount(rawToken) : null;
+    if (!user) {
+      throw new AppError("El enlace de confirmación no es válido o ha caducado", 400, "INVALID_CONFIRMATION_TOKEN");
+    }
+    return this.toPublicUser(user);
+  }
+
+  async resendConfirmation(email) {
+    if (this.requireEmailConfirmation) {
+      await this.requireConfirmationService().resendConfirmation(email);
+    }
   }
 
   async authenticate({ email, password }) {

@@ -23,6 +23,14 @@ describe("Confirmación de cuentas: repositorio en memoria", () => {
     token = newToken();
   });
 
+  it("create rechaza email duplicado con 23505/users_email_key sin insertar la segunda cuenta", async () => {
+    await repository.create(user);
+    const duplicate = newUser({ email: user.email });
+    await expect(repository.create(duplicate)).rejects.toMatchObject({ code: "23505", constraint: "users_email_key" });
+    expect(await repository.findById(duplicate.id)).toBeNull();
+    expect(await repository.findAll()).toEqual([user]);
+  });
+
   it("crea cuenta pendiente y primer token asociado, solo con hash y vigencia de 24 horas", async () => {
     const result = await repository.createPendingWithToken(user, {
       ...token, originalToken: "no-debe-persistirse", expiresAt: "2099-01-01", userId: randomUUID()

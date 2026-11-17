@@ -3,7 +3,8 @@ import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import { createApp } from "./app.js";
 import {
-  createDependencies
+  createDependencies,
+  parseEmailConfirmationSetting
 } from "./config/dependencies.js";
 import { logger } from "./utils/logger.js";
 
@@ -23,8 +24,10 @@ if (!databaseUrl) {
   );
 }
 
-const requireEmailConfirmation =
-  process.env.REQUIRE_EMAIL_CONFIRMATION === "true";
+const isProduction = process.env.NODE_ENV === "production";
+const requireEmailConfirmation = parseEmailConfirmationSetting(
+  process.env.REQUIRE_EMAIL_CONFIRMATION, { isProduction }
+);
 
 const {
   pool,
@@ -33,6 +36,12 @@ const {
 } = await createDependencies({
   databaseUrl,
   requireEmailConfirmation,
+  isProduction,
+  brevoApiKey: process.env.BREVO_API_KEY,
+  brevoSenderEmail: process.env.BREVO_SENDER_EMAIL,
+  brevoSenderName: process.env.BREVO_SENDER_NAME,
+  appBaseUrl: process.env.APP_BASE_URL,
+  isDevelopment: (process.env.NODE_ENV ?? "development") === "development",
   adminEmail: process.env.ADMIN_EMAIL,
   adminPassword: process.env.ADMIN_PASSWORD
 });
@@ -50,7 +59,7 @@ const app = createApp({
   mealService,
   sessionSecret,
   sessionStore,
-  isProduction: process.env.NODE_ENV === "production"
+  isProduction
 });
 
 app.listen(port, () => {
