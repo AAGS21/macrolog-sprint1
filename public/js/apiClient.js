@@ -47,6 +47,13 @@ export function loginUser(email, password) {
   });
 }
 
+export function resendConfirmation(email) {
+  return apiRequest("/api/auth/resend-confirmation", {
+    method: "POST",
+    body: JSON.stringify({ email })
+  });
+}
+
 export function getSession() {
   return apiRequest("/api/auth/session");
 }

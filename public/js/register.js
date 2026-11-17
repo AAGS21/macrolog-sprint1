@@ -30,7 +30,7 @@ form.addEventListener("submit", async (event) => {
 
   try {
     await registerUser(email, password);
-    window.location.replace("/login.html?registered=true");
+    window.location.replace("/login.html?registered=pending");
   } catch (error) {
     message.textContent = error.message;
     message.classList.add("form-message-error");
