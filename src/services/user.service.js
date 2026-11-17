@@ -84,6 +84,14 @@ export class UserService {
   }
 
   async authenticate({ email, password }) {
+    if (typeof password !== "string") {
+      throw new AppError(
+        "Email o contraseña incorrectos",
+        401,
+        "INVALID_CREDENTIALS"
+      );
+    }
+
     const normalizedEmail =
       typeof email === "string" ? email.trim().toLowerCase() : "";
 
@@ -106,7 +114,7 @@ export class UserService {
     }
 
     const passwordIsValid = await bcrypt.compare(
-      password ?? "",
+      password,
       user.passwordHash
     );
 

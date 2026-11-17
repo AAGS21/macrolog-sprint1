@@ -77,22 +77,43 @@ export function createAuthRouter({ userService }) {
     })
   );
 
-  router.get("/session", (request, response) => {
-    if (!request.session?.userId) {
-      return response.status(200).json({
-        authenticated: false
-      });
-    }
+  router.get(
+    "/session",
+    asyncHandler(async (request, response) => {
+      const userId = request.session?.userId;
 
-    return response.status(200).json({
-      authenticated: true,
-      user: {
-        id: request.session.userId,
-        email: request.session.email,
-        role: request.session.role
+      if (!userId) {
+        return response.status(200).json({ authenticated: false });
       }
-    });
-  });
+
+      let user;
+      try {
+        user = await userService.findActiveActor(userId);
+      } catch (error) {
+        if (error.code !== "INVALID_ACTOR") {
+          throw error;
+        }
+
+        const { path, domain, httpOnly, secure, sameSite } = request.session.cookie;
+        await destroySession(request);
+        response.clearCookie("macrolog.sid", {
+          path, domain, httpOnly, secure, sameSite
+        });
+        logger.info("session.invalidated", { userId });
+
+        return response.status(200).json({ authenticated: false });
+      }
+
+      return response.status(200).json({
+        authenticated: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role
+        }
+      });
+    })
+  );
 
   router.post(
     "/logout",
