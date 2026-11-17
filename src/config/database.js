@@ -33,6 +33,26 @@ export async function initializeDatabase(pool) {
     CREATE INDEX IF NOT EXISTS users_email_index
       ON users (email);
 
+    CREATE TABLE IF NOT EXISTS email_confirmation_tokens (
+      id UUID PRIMARY KEY,
+      user_id UUID NOT NULL REFERENCES users(id),
+      token_hash TEXT NOT NULL UNIQUE CHECK (token_hash ~ '^[0-9a-f]{64}$'),
+      created_at TIMESTAMPTZ NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL,
+      used_at TIMESTAMPTZ,
+      revoked_at TIMESTAMPTZ,
+      CHECK (expires_at = created_at + INTERVAL '24 hours'),
+      CHECK (used_at IS NULL OR (used_at >= created_at AND used_at < expires_at)),
+      CHECK (used_at IS NULL OR revoked_at IS NULL)
+    );
+
+    -- UNIQUE ya crea el índice de búsqueda por token_hash.
+    CREATE INDEX IF NOT EXISTS email_confirmation_tokens_user_created_index
+      ON email_confirmation_tokens (user_id, created_at DESC);
+
+    CREATE INDEX IF NOT EXISTS email_confirmation_tokens_expires_index
+      ON email_confirmation_tokens (expires_at);
+
     CREATE TABLE IF NOT EXISTS meals (
       id UUID PRIMARY KEY,
       user_id UUID NOT NULL REFERENCES users(id),
